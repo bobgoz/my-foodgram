@@ -1,8 +1,8 @@
-"""tags
+"""Изменил значение по умолчанию для поля avatar модели UserModel
 
-Revision ID: 9e5a4269df98
-Revises: 08642a8664f1
-Create Date: 2026-03-02 21:59:16.274239
+Revision ID: 2af7c02b56d5
+Revises: 34a844edd2d1
+Create Date: 2026-03-04 18:58:08.419605
 
 """
 from typing import Sequence, Union
@@ -12,8 +12,8 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision: str = '9e5a4269df98'
-down_revision: Union[str, Sequence[str], None] = '08642a8664f1'
+revision: str = '2af7c02b56d5'
+down_revision: Union[str, Sequence[str], None] = '34a844edd2d1'
 branch_labels: Union[str, Sequence[str], None] = None
 depends_on: Union[str, Sequence[str], None] = None
 
