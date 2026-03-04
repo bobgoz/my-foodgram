@@ -1,6 +1,19 @@
-from fastapi import APIRouter, Depends, HTTPException, status
+from typing import TypeVar
+
+from fastapi import APIRouter, Depends, HTTPException, status, Query
 from sqlalchemy import select
 from sqlalchemy.orm import Session
+from fastapi_pagination import Page, add_pagination
+from fastapi_pagination.customization import (
+    CustomizedPage,
+    UseParamsFields,
+    UseIncludeTotal,
+    UseExcludedFields,
+    UseFieldsAliases,
+)
+
+from fastapi_pagination.ext.sqlalchemy import paginate
+from fastapi_pagination.cursor import CursorPage
 
 from src.db_depends import get_session
 from src.models.users import UserModel
@@ -13,6 +26,17 @@ from src.schemas.users import (
 router = APIRouter(prefix='/users', tags=['users'])
 
 
+T = TypeVar('T')
+
+CustomPage = CustomizedPage[
+    Page[T],
+    UseFieldsAliases(
+        items='result',
+        total='count',
+    ),
+]
+
+
 @router.post(
     '/',
     response_model=UserSchema,
@@ -21,10 +45,12 @@ router = APIRouter(prefix='/users', tags=['users'])
 async def user_registration(
     user_create: UserCreate,
     session: Session = Depends(get_session),
-):
+) -> UserSchema:
     """Регистрация пользователя"""
 
-    user = UserModel(**user_create.model_dump())
+    user = UserModel(**user_create.model_dump(exclude=['password']))
+    user.set_password(user_create.password)
+
     session.add(user)
     session.commit()
     session.refresh(user)
@@ -32,7 +58,9 @@ async def user_registration(
 
 
 @router.get('/{user_id}', response_model=UserDetailSchema)
-async def get_user_by_id(user_id: int, session: Session = Depends(get_session)):
+async def get_user_by_id(
+    user_id: int, session: Session = Depends(get_session)
+) -> UserDetailSchema:
     """Получение пользователя по id"""
     user = session.scalar(
         select(UserModel).where(UserModel.id == user_id),
@@ -43,3 +71,12 @@ async def get_user_by_id(user_id: int, session: Session = Depends(get_session)):
             f'Пользователя с таким id {user_id} не найдено',
         )
     return user
+
+
+@router.get('/', response_model=CustomPage[UserDetailSchema])
+async def get_pagination_users(
+    session: Session = Depends(get_session),
+) -> CustomPage[UserDetailSchema]:
+    """Получение пагинированного списка пользователей"""
+
+    return paginate(session, select(UserModel).order_by(UserModel.id))

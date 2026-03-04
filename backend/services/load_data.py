@@ -5,6 +5,8 @@ from src.models.tags import TagModel
 from src.models.ingredients import IngredientModel
 from src.models.users import UserModel
 
+from src.auth.security import hash_password
+
 TAG_DATA = [
     {
         'name': 'Суп',
@@ -53,27 +55,38 @@ INGREDIENT_DATA = [
 
 USER_DATA = [
     {
-        'email': 'vasua@mail.ru',
-        'username': 'vasya',
+        'email': f'vasua_{i}@mail.ru',
+        'username': f'vasya_{i}',
         'first_name': 'Вася',
         'last_name': 'Василий',
-        'password': '12345',
-    },
-    {
-        'email': 'nikita@mail.ru',
-        'username': 'nikita',
-        'first_name': 'Никита',
-        'last_name': 'Пупкин',
-        'password': '12345',
-    },
-    {
-        'email': 'tema@mail.ru',
-        'username': 'tema',
-        'first_name': 'Артём',
-        'last_name': 'Ханов',
-        'password': '12345',
-    },
+        'password': hash_password('12345'),
+    }
+    for i in range(50)
 ]
+
+# USER_DATA = [
+#     {
+#         'email': 'vasua@mail.ru',
+#         'username': 'vasya',
+#         'first_name': 'Вася',
+#         'last_name': 'Василий',
+#         'password': '12345',
+#     },
+#     {
+#         'email': 'nikita@mail.ru',
+#         'username': 'nikita',
+#         'first_name': 'Никита',
+#         'last_name': 'Пупкин',
+#         'password': '12345',
+#     },
+#     {
+#         'email': 'tema@mail.ru',
+#         'username': 'tema',
+#         'first_name': 'Артём',
+#         'last_name': 'Ханов',
+#         'password': '12345',
+#     },
+# ]
 
 
 def load_data():

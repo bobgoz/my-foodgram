@@ -1,33 +1,29 @@
 from pydantic import BaseModel, Field, EmailStr
 
 
-class UserCreate(BaseModel):
-    """Схема для создания пользователя"""
+class UserBase(BaseModel):
+    """Базовая User схема"""
 
     email: EmailStr
     username: str = Field(title='Имя пользователя', pattern='^[\w.@+-]+\z')
     first_name: str
     last_name: str
+
+
+class UserCreate(UserBase):
+    """Схема для создания пользователя"""
+
     password: str
 
 
-class UserListSchema(BaseModel):
+class UserListSchema(UserBase):
     """Схема для отображения списка пользователей"""
 
-    email: EmailStr
     id: int
-    username: str
-    first_name: str
-    last_name: str
 
 
-class UserDetailSchema(BaseModel):
+class UserDetailSchema(UserListSchema):
     """Схема для отображения детальной информации о пользователе"""
 
-    email: EmailStr
-    id: int
-    username: str
-    first_name: str
-    last_name: str
     is_subscribed: bool
     avatar: str

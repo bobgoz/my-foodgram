@@ -2,6 +2,7 @@ from src.database import Base
 from src.models.mixins import PrimaryKeyMixin
 from sqlalchemy import String
 from sqlalchemy.orm import mapped_column, Mapped
+from src.auth.security import hash_password
 
 MAX_LENGTH_EMAIL_FIELD = 254
 MAX_LENGTH_USERNAME_FIELD = 150
@@ -32,3 +33,8 @@ class UserModel(PrimaryKeyMixin, Base):
     is_subscribed: Mapped[bool] = mapped_column(default=False)
     avatar: Mapped[str] = mapped_column(default='')
     password: Mapped[str] = mapped_column(String(50))
+
+    def set_password(self, password: str):
+        """ Установка хешированного пароля """
+        self.password = hash_password(password)
+
