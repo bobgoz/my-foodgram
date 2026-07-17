@@ -1,8 +1,8 @@
-from src.database import Base
-from src.models.mixins import PrimaryKeyMixin
+from backend.app.database import Base
+from backend.app.models.mixins import PrimaryKeyMixin
 from sqlalchemy import String
 from sqlalchemy.orm import mapped_column, Mapped
-from src.auth.security import hash_password
+from backend.app.auth.security import hash_password
 
 MAX_LENGTH_EMAIL_FIELD = 254
 MAX_LENGTH_USERNAME_FIELD = 150

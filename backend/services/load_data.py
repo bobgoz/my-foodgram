@@ -1,11 +1,11 @@
 from sqlalchemy import delete
 
-from src.database import SessionLocal
-from src.models.tags import TagModel
-from src.models.ingredients import IngredientModel
-from src.models.users import UserModel
+from app.database import SessionLocal
+from app.models.tags import TagModel
+from app.models.ingredients import IngredientModel
+from app.models.users import UserModel
 
-from src.auth.security import hash_password
+from app.auth.security import hash_password
 
 TAG_DATA = [
     {

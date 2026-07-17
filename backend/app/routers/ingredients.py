@@ -1,10 +1,9 @@
+from backend.app.db_depends import get_session
+from backend.app.models.ingredients import IngredientModel
+from backend.app.schemas.ingredients import IngredientSchema
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy import select
 from sqlalchemy.orm import Session
-
-from src.db_depends import get_session
-from src.models.ingredients import IngredientModel
-from src.schemas.ingredients import IngredientSchema
 
 router = APIRouter(prefix='/ingredients', tags=['ingredients'])
 
