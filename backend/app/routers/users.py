@@ -1,27 +1,28 @@
 from typing import TypeVar
 
-from fastapi import APIRouter, Depends, HTTPException, status, Query
-from sqlalchemy import select
-from sqlalchemy.orm import Session
+from fastapi import APIRouter, Depends, HTTPException, Query, status
 from fastapi_pagination import Page, add_pagination
+from fastapi_pagination.cursor import CursorPage
 from fastapi_pagination.customization import (
     CustomizedPage,
-    UseParamsFields,
-    UseIncludeTotal,
     UseExcludedFields,
     UseFieldsAliases,
+    UseIncludeTotal,
+    UseParamsFields,
 )
-
 from fastapi_pagination.ext.sqlalchemy import paginate
-from fastapi_pagination.cursor import CursorPage
+from sqlalchemy import select
+from sqlalchemy.orm import Session
 
 from backend.app.db_depends import get_session
 from backend.app.models.users import UserModel
 from backend.app.schemas.users import (
-    UserListSchema as UserSchema,
+    SetPasswordSchema,
+    UserAvatarSchema,
     UserCreate,
     UserDetailSchema,
 )
+from backend.app.schemas.users import UserListSchema as UserSchema
 
 router = APIRouter(prefix='/users', tags=['users'])
 
@@ -71,6 +72,47 @@ async def get_user_by_id(
             f'Пользователя с таким id {user_id} не найдено',
         )
     return user
+
+
+@router.get('/users/me', response_model=UserDetailSchema)
+async def get_user_profile(
+    session: Session = Depends(get_session),
+) -> UserDetailSchema:
+    """Получение профиля пользователя."""
+    # Имеет смысл реализовать после реализации аутентификации.
+    raise HTTPException(
+        status_code=status.HTTP_501_NOT_IMPLEMENTED,
+        detail='Эндпоинт не  реализован',
+    )
+
+
+@router.get('/users/me/avatar', response_model=UserAvatarSchema)
+async def get_user_avatar(session: Session = Depends(get_session)):
+    """Получение аватара пользователя."""
+    # Имеет смысл реализовать после реализации аутентификации.
+    raise HTTPException(
+        status_code=status.HTTP_501_NOT_IMPLEMENTED,
+        detail='Эндпоинт не  реализован',
+    )
+
+
+@router.delete('/users/me/avatar', status_code=status.HTTP_204_NO_CONTENT)
+async def user_delete_avatar(session: Session = Depends(get_session)):
+    """Удаление аватара."""
+    # Имеет смысл реализовать после реализации аутентификации.
+    raise HTTPException(
+        status_code=status.HTTP_501_NOT_IMPLEMENTED,
+        detail='Эндпоинт не  реализован',
+    )
+
+
+@router.post('/users/set_password')
+async def set_password(
+    set_password: SetPasswordSchema,
+    session: Session = Depends(get_session),
+):
+    """Назначение нового пароля."""
+    pass
 
 
 @router.get('/', response_model=CustomPage[UserDetailSchema])

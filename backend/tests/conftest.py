@@ -7,7 +7,10 @@ from sqlalchemy.pool import StaticPool
 from backend.app.database import Base, SessionLocal
 from backend.app.db_depends import get_session
 from backend.app.main import app
-from backend.app.models.tags import TagModel
+
+from .fixtures.ingredients import *
+from .fixtures.tags import *
+from .fixtures.users import *
 
 SQLITE_DATABASE_URL = 'sqlite:///./test_db.db'
 
@@ -50,53 +53,3 @@ def client(db_session):
     app.dependency_overrides[get_session] = override_get_session
     with TestClient(app) as test_client:
         yield test_client
-
-
-@fixture
-def tag_object(db_session):
-    tag = TagModel(
-        name='Борщ',
-        slug='borsch',
-    )
-    db_session.add(tag)
-    db_session.commit()
-    db_session.refresh(tag)
-
-    return tag
-
-
-@fixture
-def tags(db_session):
-    """Создание 10 тегов"""
-    tags = [
-        TagModel(
-            name=f'Завтрак_{i}',
-            slug=f'breakfast_{i}',
-        )
-        for i in range(10)
-    ]
-    db_session.add_all(tags)
-    db_session.commit()
-
-
-@fixture
-def tag_url():
-    return '/tags'
-
-
-@fixture
-def tag_detail_url(tag_object):
-    return f'/tags/{tag_object.id}'
-
-
-@fixture
-def tag_form():
-    return dict(
-        tag='Молочные продукты',
-        slug='milk',
-    )
-
-
-@fixture
-def create_tag_url():
-    return ''

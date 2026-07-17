@@ -1,4 +1,4 @@
-from pydantic import BaseModel, Field, EmailStr
+from pydantic import BaseModel, EmailStr, Field
 
 
 class UserBase(BaseModel):
@@ -22,8 +22,35 @@ class UserListSchema(UserBase):
     id: int
 
 
-class UserDetailSchema(UserListSchema):
+class BaseAvatarSchema(BaseModel):
+    """Базовая схема с аватаром."""
+
+    avatar: str
+
+
+class UserDetailSchema(
+    UserListSchema,
+    BaseAvatarSchema,
+):
     """Схема для отображения детальной информации о пользователе"""
 
     is_subscribed: bool
-    avatar: str
+
+
+class UserAfterRegistrationSchema(UserListSchema):
+    """Схема для отображения информации после регистрации пользователя."""
+
+    pass
+
+
+class UserAvatarSchema(BaseAvatarSchema):
+    """Схема для аватара пользователя."""
+
+    pass
+
+
+class SetPasswordSchema(BaseModel):
+    """Схема для назначения нового пароля."""
+
+    new_password: str = Field(title='Новый пароль')
+    current_password: str = Field(title='Текущий пароль пароль')

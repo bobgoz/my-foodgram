@@ -1,8 +1,5 @@
 import pytest
-from fastapi.testclient import TestClient
-from fastapi_testing import create_test_server
 
-from backend.app.main import app
 
 def test_tag_url(
     tag_url,
