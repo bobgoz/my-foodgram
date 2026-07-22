@@ -2,10 +2,11 @@ from sqlalchemy import String
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from backend.app.database import Base
+
+# from .recipes import RecipeModel, recipe_tag
+from backend.app.models.associations import recipe_tag
 from backend.app.models.constants import MAX_LENGTH
 from backend.app.models.mixins import PrimaryKeyMixin
-
-from .recipes import RecipeModel, recipe_tag
 
 
 class TagModel(PrimaryKeyMixin, Base):
@@ -16,9 +17,7 @@ class TagModel(PrimaryKeyMixin, Base):
     slug: Mapped[str] = mapped_column(
         String(MAX_LENGTH), unique=True, nullable=True
     )
-    recipes: Mapped[list['RecipeModel']] = mapped_column(
-        relationship(
-            secondary=recipe_tag,
-            back_populates='tags',
-        )
+    recipes: Mapped[list['RecipeModel']] = relationship(
+        secondary=recipe_tag,
+        back_populates='tags',
     )

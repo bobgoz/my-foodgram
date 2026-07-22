@@ -57,7 +57,7 @@ def test_delete_avatar(client):
 
 def test_url_set_password(client):
     """Тестирование назначения пароля."""
-    url = '/users/set_password''
+    url = '/users/set_password'
     response = client.delete(url)
     assert response.status_code == HTTPStatus.NO_CONTENT
 

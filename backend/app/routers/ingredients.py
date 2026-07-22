@@ -1,9 +1,10 @@
-from backend.app.db_depends import get_session
-from backend.app.models.ingredients import IngredientModel
-from backend.app.schemas.ingredients import IngredientSchema
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy import select
 from sqlalchemy.orm import Session
+
+from backend.app.db_depends import get_session
+from backend.app.models import IngredientModel
+from backend.app.schemas.ingredients import IngredientSchema
 
 router = APIRouter(prefix='/ingredients', tags=['ingredients'])
 
@@ -11,7 +12,7 @@ router = APIRouter(prefix='/ingredients', tags=['ingredients'])
 @router.get('/', response_model=list[IngredientSchema])
 async def get_all_ingredients(
     session: Session = Depends(get_session),
-) -> list[IngredientModel]:
+) -> list['IngredientModel']:
     """Получение всех ингредиентов"""
     ingredients = session.scalars(select(IngredientModel)).all()
     return list(ingredients)

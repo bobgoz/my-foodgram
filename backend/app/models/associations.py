@@ -1,6 +1,7 @@
-""" Модуль, содержащий таблицы для связанных моделей Many-to-Many. """
+"""Модуль, содержащий таблицы для связанных моделей Many-to-Many."""
 
-from sqlal
+from backend.app.database import Base
+from sqlalchemy import Column, ForeignKey, Integer, Table
 
 recipe_ingredient = Table(
     'recipe_ingredient',
