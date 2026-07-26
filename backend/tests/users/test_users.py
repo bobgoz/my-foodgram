@@ -1,14 +1,16 @@
 from http import HTTPStatus
 
+from fastapi import status
+
 from backend.app.schemas.users import (
     UserAfterRegistrationSchema,
     UserDetailSchema,
 )
 
 
-def test_registration_user(client, user_registration_form_data):
+def test_registration_user(client, registration_form_data):
     """Тест регистрации пользователя."""
-    response = client.post('/users', json=user_registration_form_data)
+    response = client.post('/users', json=registration_form_data)
     data = response.json()
     assert response.status_code == HTTPStatus.CREATED, f'{data}'
     expected_fields = set(UserAfterRegistrationSchema.model_fields)
@@ -42,7 +44,7 @@ def test_user_profile(client, user):
 
 
 def test_user_avatar_url(client):
-    """Тестирование брла с аватаром."""
+    """Тестирование юрла с аватаром."""
     url = '/users/me/avatar'
     response = client.get(url)
     assert response.status_code == HTTPStatus.OK
@@ -61,10 +63,7 @@ def test_url_set_password(client):
     response = client.delete(url)
     assert response.status_code == HTTPStatus.NO_CONTENT
 
-def test_auth():
-    """ Тест, связанный с аутентификацией """
-    pass
-    
+
 def test_auth_2():
-    """ Тест, связанный с аутентификацией """
+    """Тест, связанный с аутентификацией"""
     pass

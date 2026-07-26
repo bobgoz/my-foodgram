@@ -53,3 +53,13 @@ def client(db_session):
     app.dependency_overrides[get_session] = override_get_session
     with TestClient(app) as test_client:
         yield test_client
+
+
+@fixture
+def auth_client(client, login_form_data):
+    """Авторизованный тестовый клиент."""
+
+    response = client.post('auth/token/login', json=login_form_data)
+    token = response.json().get('auth_token')
+    client.headers.update({"Authorization": f"Bearer {token}"})
+    return client

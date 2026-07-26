@@ -1,7 +1,7 @@
 from sqlalchemy import String
-from sqlalchemy.orm import Mapped, mapped_column
+from sqlalchemy.orm import Mapped, mapped_column, validates
 
-from backend.app.auth.security import hash_password
+from backend.app.auth import hash_password
 from backend.app.database import Base
 from backend.app.models.mixins import PrimaryKeyMixin
 
@@ -35,6 +35,13 @@ class UserModel(PrimaryKeyMixin, Base):
     avatar: Mapped[str] = mapped_column(default='')
     password: Mapped[str] = mapped_column(String(50))
 
-    def set_password(self, password: str):
-        """Установка хешированного пароля"""
-        self.password = hash_password(password)
+    @validates('password')
+    def validate_password(self, key, value: str) -> str:
+        """
+        Валидатор пароля.
+        Автоматически хеширует пароль.
+        """
+        if not value.startswith('$2b$'):
+            value = hash_password(value)
+
+        return value

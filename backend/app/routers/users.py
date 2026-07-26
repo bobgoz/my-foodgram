@@ -14,8 +14,10 @@ from fastapi_pagination.ext.sqlalchemy import paginate
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 
+from backend.app.auth import get_current_user
 from backend.app.db_depends import get_session
-from backend.app.models.users import UserModel
+from backend.app.models import UserModel
+from backend.app.schemas.auth import TokenResponseSchema
 from backend.app.schemas.users import (
     SetPasswordSchema,
     UserAvatarSchema,
@@ -23,6 +25,9 @@ from backend.app.schemas.users import (
     UserDetailSchema,
 )
 from backend.app.schemas.users import UserListSchema as UserSchema
+from backend.app.schemas.users import (
+    UserLoginSchema,
+)
 
 router = APIRouter(prefix='/users', tags=['users'])
 
@@ -49,8 +54,16 @@ async def user_registration(
 ) -> UserSchema:
     """Регистрация пользователя"""
 
-    user = UserModel(**user_create.model_dump(exclude=['password']))
-    user.set_password(user_create.password)
+    result = session.execute(
+        select(UserModel).where(UserModel.email == user_create.email),
+    ).first()
+    if result:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail='Такой email уже занят',
+        )
+
+    user = UserModel(**user_create.model_dump())
 
     session.add(user)
     session.commit()
@@ -60,7 +73,9 @@ async def user_registration(
 
 @router.get('/{user_id}', response_model=UserDetailSchema)
 async def get_user_by_id(
-    user_id: int, session: Session = Depends(get_session)
+    user_id: int,
+    session: Session = Depends(get_session),
+    current_user: UserModel = Depends(get_current_user),
 ) -> UserDetailSchema:
     """Получение пользователя по id"""
     user = session.scalar(
@@ -74,16 +89,16 @@ async def get_user_by_id(
     return user
 
 
-@router.get('/users/me', response_model=UserDetailSchema)
+@router.get(
+    '/me',
+    response_model=UserDetailSchema,
+    summary='Получение профиля текущего пользователя',
+)
 async def get_user_profile(
-    session: Session = Depends(get_session),
+    current_user: UserModel = Depends(get_current_user),
 ) -> UserDetailSchema:
     """Получение профиля пользователя."""
-    # Имеет смысл реализовать после реализации аутентификации.
-    raise HTTPException(
-        status_code=status.HTTP_501_NOT_IMPLEMENTED,
-        detail='Эндпоинт не  реализован',
-    )
+    return UserDetailSchema.model_validate(current_user)
 
 
 @router.get('/users/me/avatar', response_model=UserAvatarSchema)

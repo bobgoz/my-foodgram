@@ -1,23 +1,35 @@
 from pydantic import BaseModel, EmailStr, Field
 
 
-class UserBase(BaseModel):
-    """Базовая User схема"""
+class UserEmail(BaseModel):
+    """Схема, содержащая поле email."""
 
     email: EmailStr
-    username: str = Field(title='Имя пользователя', pattern='^[\w.@+-]+\z')
+
+
+class UserBase(UserEmail):
+    """Базовая User схема."""
+
+    username: str = Field(title='Имя пользователя', pattern='^[\\w.@+-]+\\z')
     first_name: str
     last_name: str
 
 
 class UserCreate(UserBase):
-    """Схема для создания пользователя"""
+    """Схема для создания пользователя."""
 
     password: str
 
 
+class UserLoginSchema(BaseModel):
+    """Схема для входа пользователя."""
+
+    email: EmailStr
+    password: str
+
+
 class UserListSchema(UserBase):
-    """Схема для отображения списка пользователей"""
+    """Схема для отображения списка пользователей."""
 
     id: int
 
@@ -28,11 +40,8 @@ class BaseAvatarSchema(BaseModel):
     avatar: str
 
 
-class UserDetailSchema(
-    UserListSchema,
-    BaseAvatarSchema,
-):
-    """Схема для отображения детальной информации о пользователе"""
+class UserDetailSchema(UserListSchema, BaseAvatarSchema):
+    """Схема для отображения детальной информации о пользователе."""
 
     is_subscribed: bool
 
@@ -52,5 +61,5 @@ class UserAvatarSchema(BaseAvatarSchema):
 class SetPasswordSchema(BaseModel):
     """Схема для назначения нового пароля."""
 
-    new_password: str = Field(title='Новый пароль')
-    current_password: str = Field(title='Текущий пароль пароль')
+    new_password: str = Field(title='Новый пароль', min_length=8)
+    current_password: str = Field(title='Текущий пароль')
