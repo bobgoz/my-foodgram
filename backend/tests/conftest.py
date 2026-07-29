@@ -1,3 +1,4 @@
+from fastapi import status
 from fastapi.testclient import TestClient
 from pytest import fixture
 from sqlalchemy import create_engine
@@ -8,9 +9,11 @@ from backend.app.database import Base, SessionLocal
 from backend.app.db_depends import get_session
 from backend.app.main import app
 
-from .fixtures.ingredients import *
-from .fixtures.tags import *
-from .fixtures.users import *
+from .auth.fixtures import *
+from .ingredients.fixtures import *
+from .recipes.fixtures import *
+from .tags.fixtures import *
+from .users.fixtures import *
 
 SQLITE_DATABASE_URL = 'sqlite:///./test_db.db'
 
@@ -56,10 +59,14 @@ def client(db_session):
 
 
 @fixture
-def auth_client(client, login_form_data):
+def auth_client(client, login_form_data, user, login_url):
     """Авторизованный тестовый клиент."""
 
-    response = client.post('auth/token/login', json=login_form_data)
-    token = response.json().get('auth_token')
+    response = client.post(login_url, json=login_form_data)
+    data = response.json()
+    assert (
+        response.status_code == status.HTTP_200_OK
+    ), f'Ошибка при авторизации {data}'
+    token = data.get('auth_token')
     client.headers.update({"Authorization": f"Bearer {token}"})
     return client

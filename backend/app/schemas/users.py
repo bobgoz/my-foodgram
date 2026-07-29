@@ -1,4 +1,11 @@
-from pydantic import BaseModel, EmailStr, Field
+from pydantic import (
+    BaseModel,
+    EmailStr,
+    Field,
+    ValidationError,
+    field_validator,
+    model_validator,
+)
 
 
 class UserEmail(BaseModel):
@@ -21,7 +28,7 @@ class UserCreate(UserBase):
     password: str
 
 
-class UserLoginSchema(BaseModel):
+class LoginSchema(BaseModel):
     """Схема для входа пользователя."""
 
     email: EmailStr
@@ -45,6 +52,9 @@ class UserDetailSchema(UserListSchema, BaseAvatarSchema):
 
     is_subscribed: bool
 
+    class Config:
+        from_attributes = True
+
 
 class UserAfterRegistrationSchema(UserListSchema):
     """Схема для отображения информации после регистрации пользователя."""
@@ -57,9 +67,20 @@ class UserAvatarSchema(BaseAvatarSchema):
 
     pass
 
+    class Config:
+        from_attributes = True
+
 
 class SetPasswordSchema(BaseModel):
     """Схема для назначения нового пароля."""
 
     new_password: str = Field(title='Новый пароль', min_length=8)
     current_password: str = Field(title='Текущий пароль')
+
+    @model_validator(mode='after')
+    def password_validate(self):
+        """Валидация пароля.
+        Проверяет, что 2 пароля не одинаковы."""
+        if self.new_password == self.current_password:
+            raise ValueError('Введённые пароли не должны совпадать.')
+        return self

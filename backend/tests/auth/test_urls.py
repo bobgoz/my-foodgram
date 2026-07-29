@@ -3,15 +3,13 @@
 from fastapi import status
 
 
-def test_login_url(user, login_form_data, client):
+def test_login_url(user, login_form_data, client, login_url):
     """Тест, проверяющий получение токена."""
-    login_url = '/auth/token/login'
     response = client.post(login_url, json=login_form_data)
     assert response.status_code == status.HTTP_200_OK
 
 
-def test_login_url(user, auth_client):
+def test_logout_url(user, auth_client, logout_url):
     """Тест, проверяющий выход из системы."""
-    login_url = '/auth/token/logout'
-    response = auth_client.post(login_url)
+    response = auth_client.post(logout_url)
     assert response.status_code == status.HTTP_204_NO_CONTENT

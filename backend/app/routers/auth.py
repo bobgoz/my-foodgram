@@ -13,7 +13,7 @@ from backend.app.auth import create_access_token, get_current_user
 from backend.app.db_depends import get_session
 from backend.app.models import UserModel
 from backend.app.schemas.auth import TokenResponseSchema
-from backend.app.schemas.users import UserLoginSchema
+from backend.app.schemas.users import LoginSchema
 
 router = APIRouter(
     prefix='/auth/token',
@@ -29,7 +29,7 @@ router = APIRouter(
     'Возвращает JWT токен.',
 )
 async def login(
-    login_data: UserLoginSchema, session: Session = Depends(get_session)
+    login_data: LoginSchema, session: Session = Depends(get_session)
 ) -> TokenResponseSchema:
     """Эндпоинт для входа пользователя."""
     user = session.scalar(
