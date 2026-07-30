@@ -38,9 +38,10 @@ class RecipeResponseSchema(BaseModel):
     tags: list[TagSchema]
     author: UserDetailSchema
     ingredients: list[IngredientInRecipeResponseSchema]
-    is_favorited: bool
-    is_in_shopping_cart: bool
+    is_favorited: bool = Field(default=False)
+    is_in_shopping_cart: bool = Field(default=False)
     name: str
-    image: HttpUrl
+    # image: HttpUrl
+    image: str
     text: str
     cooking_time: int

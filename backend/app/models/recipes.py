@@ -34,3 +34,14 @@ class RecipeModel(
         secondary=recipe_tag,
         back_populates='recipes',
     )
+    author_id: Mapped[int] = mapped_column(
+        (
+            ForeignKey(
+                'users.id',
+                name='fk_recipes_users',
+            )
+        )
+    )
+    author: Mapped['UserModel'] = relationship(
+        back_populates='recipes',
+    )

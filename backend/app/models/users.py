@@ -1,5 +1,5 @@
 from sqlalchemy import String
-from sqlalchemy.orm import Mapped, mapped_column, validates
+from sqlalchemy.orm import Mapped, mapped_column, relationship, validates
 
 from backend.app.auth import hash_password
 from backend.app.database import Base
@@ -34,6 +34,9 @@ class UserModel(PrimaryKeyMixin, Base):
     is_subscribed: Mapped[bool] = mapped_column(default=False)
     avatar: Mapped[str] = mapped_column(default='')
     password: Mapped[str] = mapped_column(String(50))
+    recipes: Mapped[list['RecipeModel']] = relationship(
+        back_populates='author'
+    )
 
     @validates('password')
     def validate_password(self, key, value: str) -> str:
