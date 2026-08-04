@@ -10,11 +10,11 @@ from backend.app.schemas.users import (
 
 def test_registration_user(
     client,
-    users_endpoint,
+    users_url,
     registration_form_data,
 ):
     """Тест регистрации пользователя."""
-    response = client.post(users_endpoint, json=registration_form_data)
+    response = client.post(users_url, json=registration_form_data)
     data = response.json()
     assert response.status_code == HTTPStatus.CREATED, f'{data}'
     expected_fields = set(UserAfterRegistrationSchema.model_fields)
@@ -39,10 +39,10 @@ def test_detail_url(
 
 def test_user_profile(
     auth_client,
-    me_endpoint,
+    me_url,
 ):
     """Тестирование юрла с профилем пользователя"""
-    response = auth_client.get(me_endpoint)
+    response = auth_client.get(me_url)
     data = response.json()
     assert response.status_code == HTTPStatus.OK, f'{data}'
     fields = set(UserDetailSchema.model_fields)

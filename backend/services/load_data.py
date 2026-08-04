@@ -1,11 +1,8 @@
+from backend.app.database import SessionLocal
+from backend.app.models.ingredients import IngredientModel
+from backend.app.models.tags import TagModel
+from backend.app.models.users import UserModel
 from sqlalchemy import delete
-
-from app.database import SessionLocal
-from app.models.tags import TagModel
-from app.models.ingredients import IngredientModel
-from app.models.users import UserModel
-
-from app.auth.security import hash_password
 
 TAG_DATA = [
     {
@@ -59,34 +56,10 @@ USER_DATA = [
         'username': f'vasya_{i}',
         'first_name': 'Вася',
         'last_name': 'Василий',
-        'password': hash_password('12345'),
+        'password': '12345',
     }
     for i in range(50)
 ]
-
-# USER_DATA = [
-#     {
-#         'email': 'vasua@mail.ru',
-#         'username': 'vasya',
-#         'first_name': 'Вася',
-#         'last_name': 'Василий',
-#         'password': '12345',
-#     },
-#     {
-#         'email': 'nikita@mail.ru',
-#         'username': 'nikita',
-#         'first_name': 'Никита',
-#         'last_name': 'Пупкин',
-#         'password': '12345',
-#     },
-#     {
-#         'email': 'tema@mail.ru',
-#         'username': 'tema',
-#         'first_name': 'Артём',
-#         'last_name': 'Ханов',
-#         'password': '12345',
-#     },
-# ]
 
 
 def load_data():

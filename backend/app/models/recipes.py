@@ -45,3 +45,7 @@ class RecipeModel(
     author: Mapped['UserModel'] = relationship(
         back_populates='recipes',
     )
+    shopping_cart: Mapped[list['ShoppingCartModel']] = relationship(
+        back_populates='recipe',
+        cascade='all, delete',
+    )

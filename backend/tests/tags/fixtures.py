@@ -7,10 +7,24 @@ from backend.app.models import TagModel
 
 @fixture
 def tag_object(db_session):
-    """Создание объекта Тег."""
+    """Объект Тега."""
     tag = TagModel(
-        name='Борщ',
-        slug='borsch',
+        name='Сладкое',
+        slug='dessert',
+    )
+    db_session.add(tag)
+    db_session.commit()
+    # db_session.refresh(tag)
+
+    return tag
+
+
+@fixture
+def secondary_tag_object(db_session):
+    """Второй объект Тега."""
+    tag = TagModel(
+        name='Супы',
+        slug='soups',
     )
     db_session.add(tag)
     db_session.commit()
@@ -31,6 +45,10 @@ def tags(db_session):
     ]
     db_session.add_all(tags)
     db_session.commit()
+    for tag in tags:
+        db_session.refresh(tag)
+
+    return tags
 
 
 @fixture

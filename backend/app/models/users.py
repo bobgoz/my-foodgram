@@ -37,6 +37,9 @@ class UserModel(PrimaryKeyMixin, Base):
     recipes: Mapped[list['RecipeModel']] = relationship(
         back_populates='author'
     )
+    shopping_cart: Mapped[list['ShoppingCartModel']] = relationship(
+        back_populates='user'
+    )
 
     @validates('password')
     def validate_password(self, key, value: str) -> str:

@@ -5,8 +5,24 @@ from backend.app.models import IngredientModel
 
 @fixture
 def ingredient_object(db_session):
+    """Объект ингредиента."""
+
     ingredient = IngredientModel(
         name='Борщ',
+        measurement_unit='грамм',
+    )
+    db_session.add(ingredient)
+    db_session.commit()
+    db_session.refresh(ingredient)
+
+    return ingredient
+
+
+@fixture
+def secondary_ingredient_object(db_session):
+    """Второй объект ингредиента."""
+    ingredient = IngredientModel(
+        name='Курица',
         measurement_unit='грамм',
     )
     db_session.add(ingredient)
@@ -28,6 +44,10 @@ def ingredients(db_session):
     ]
     db_session.add_all(ingredients)
     db_session.commit()
+    # for ing in ingredients:
+    #     db_session.refresh(ing)
+
+    return ingredients
 
 
 @fixture

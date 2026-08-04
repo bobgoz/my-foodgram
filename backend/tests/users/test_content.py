@@ -6,7 +6,7 @@ from fastapi import status
 def test_users_list(
     users_objects,
     auth_client,
-    users_endpoint,
+    users_url,
 ):
     """
     Проверка, что выводится 10 пользователей в эндпоинте /users/.
@@ -15,7 +15,7 @@ def test_users_list(
     так как авторизованный клиент возвращает создает еще одного
     пользователя.
     """
-    response = auth_client.get(users_endpoint)
+    response = auth_client.get(users_url)
     data = response.json()
 
     assert response.status_code == status.HTTP_200_OK, f'{data}'

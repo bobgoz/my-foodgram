@@ -1,7 +1,8 @@
 """Модуль, содержащий таблицы для связанных моделей Many-to-Many."""
 
-from backend.app.database import Base
 from sqlalchemy import Column, ForeignKey, Integer, Table
+
+from backend.app.database import Base
 
 recipe_ingredient = Table(
     'recipe_ingredient',
@@ -13,7 +14,7 @@ recipe_ingredient = Table(
         ForeignKey('ingredients.id'),
         primary_key=True,
     ),
-    Column('amount', Integer, nullable=False, default=1),
+    Column('amount', Integer, nullable=False),
 )
 
 recipe_tag = Table(

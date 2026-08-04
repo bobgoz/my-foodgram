@@ -78,13 +78,13 @@ def new_password_form_data(user_data) -> dict:
 
 
 @fixture
-def users_endpoint():
+def users_url():
     """Эндпоинт /users."""
     return '/users'
 
 
 @fixture
-def me_endpoint():
+def me_url():
     """Эндпоинт /users/me."""
     return '/users/me'
 

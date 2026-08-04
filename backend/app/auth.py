@@ -12,7 +12,7 @@ from .db_depends import get_session
 
 pwd_context = CryptContext(schemes=['bcrypt'], deprecated='auto')
 
-ACCESS_TOKEN_EXPIRE_MINUTES = 30
+ACCESS_TOKEN_EXPIRE_MINUTES = 100000
 
 oauth2_scheme = OAuth2PasswordBearer(
     tokenUrl='/auth/token',
