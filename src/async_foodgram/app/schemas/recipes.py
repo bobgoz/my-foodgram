@@ -1,4 +1,4 @@
-from pydantic import BaseModel, Field, HttpUrl
+from pydantic import BaseModel, Field, HttpUrl, model_validator
 
 from .tags import TagSchema
 from .users import UserDetailSchema
@@ -24,14 +24,14 @@ class RecipeCreateSchema(BaseModel):
     cooking_time: int
 
 
-class IngredientInRecipeResponseSchema(IngredientInRecipeCreateSchema):
+# class IngredientInRecipeResponseSchema(IngredientInRecipeCreateSchema):
+class IngredientInRecipeResponseSchema(BaseModel):
     """Схема Ингредиент в рецепте в ответе на создание рецепта."""
 
     name: str
     measurement_unit: str
     amount: int = Field(
         description='Количество ингредиента',
-        default='Это временное решение',
     )
 
     class Config:
@@ -52,6 +52,26 @@ class RecipeResponseSchema(BaseModel):
     image: str
     text: str
     cooking_time: int
+
+    @model_validator(mode='before')
+    @classmethod
+    def build_ingredients(cls, data):
+        """Преобразует recipe_ingredients в ingredients."""
+        # Если data — это объект модели SQLAlchemy
+        if hasattr(data, 'recipe_ingredients'):
+            ingredients = []
+            for recipe_ing in data.recipe_ingredients:
+                ingredients.append(
+                    {
+                        'id': recipe_ing.ingredient.id,
+                        'name': recipe_ing.ingredient.name,
+                        'measurement_unit': recipe_ing.ingredient.measurement_unit,
+                        'amount': recipe_ing.amount,  # ← Вот он, amount!
+                    }
+                )
+            # Устанавливаем ingredients как атрибут объекта
+            data.ingredients = ingredients
+        return data
 
     class Config:
         from_attributes = True

@@ -18,6 +18,7 @@ from async_foodgram.app.auth import get_current_user
 from async_foodgram.app.db_depends import get_session
 from async_foodgram.app.models import (
     IngredientModel,
+    RecipeIngredientModel,
     RecipeModel,
     ShoppingCartModel,
     TagModel,
@@ -72,7 +73,7 @@ async def create_recipe(
     session.refresh(recipe)
 
     for ing in recipe_create.ingredients:
-        stmt = insert(recipe_ingredient).values(
+        stmt = insert(RecipeIngredientModel).values(
             recipe_id=recipe.id,
             ingredient_id=ing.id,
             amount=ing.amount,

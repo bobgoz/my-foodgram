@@ -26,8 +26,13 @@ class RecipeModel(
     text: Mapped[str] = mapped_column(String(100))
     cooking_time: Mapped[int] = mapped_column()
     image: Mapped[str] = mapped_column()
-    ingredients: Mapped[list['IngredientModel']] = relationship(
-        secondary=recipe_ingredient, back_populates='recipes'
+    # Старая связь
+    # ingredients: Mapped[list['IngredientModel']] = relationship(
+    #     secondary=recipe_ingredient, back_populates='recipes'
+    # )
+    recipe_ingredients: Mapped[list['RecipeIngredientModel']] = relationship(
+        back_populates='recipe',
+        cascade='all, delete-orphan',
     )
 
     tags: Mapped[list['TagModel']] = relationship(

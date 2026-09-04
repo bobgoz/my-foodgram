@@ -19,7 +19,7 @@ class IngredientModel(Base, PrimaryKeyMixin):
         String(MAX_LENGTH_MEASUREMENT_UNIT),
         nullable=False,
     )
-    recipes: Mapped[list['RecipeModel']] = relationship(
-        secondary=recipe_ingredient,
-        back_populates='ingredients',
-    )
+    # recipes: Mapped[list['RecipeModel']] = relationship(
+    #     secondary=recipe_ingredient,
+    #     back_populates='ingredients',
+    # )
