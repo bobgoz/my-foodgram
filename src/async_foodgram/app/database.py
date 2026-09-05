@@ -6,7 +6,7 @@ BASE_DIR = Path(__file__).parent.parent.parent.parent
 
 DATABASE_URL = f'sqlite:///{BASE_DIR}/foodgram.db'
 
-engine = create_engine(DATABASE_URL, echo=True)
+engine = create_engine(DATABASE_URL)
 
 SessionLocal = sessionmaker(engine)
 
