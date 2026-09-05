@@ -1,0 +1,79 @@
+services:
+  # ===== POSTGRESQL =====
+  db:
+    image: postgres:15-alpine
+    container_name: foodgram_db
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: test
+      POSTGRES_PASSWORD: test
+      POSTGRES_DB: test
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    # healthcheck:
+    #   test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER}"]
+    #   interval: 10s
+    #   timeout: 5s
+    #   retries: 5
+    networks:
+      - foodgram_network
+
+  # ===== БЭКЕНД (FASTAPI) =====
+  backend:
+    build:
+      context: .
+      file: src/async_foodgram/Dockerfile
+    container_name: foodgram_backend
+    restart: unless-stopped
+    depends_on:
+      db
+        # condition: service_healthy
+    env_file:
+      - fileName
+    environment:
+      DATABASE_URL: postgresql://test:pass@db:5432/db
+      
+    volumes:
+      - ./static:/app/static
+      - ./media:/app/media
+    networks:
+      - foodgram_network
+
+  # ===== ФРОНТЕНД =====
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: foodgram_frontend
+    restart: always
+    volumes:
+      - ./frontend/build:/usr/share/nginx/html
+    networks:
+      - foodgram_network
+
+  # ===== NGINX =====
+  nginx:
+    image: nginx:alpine
+    container_name: foodgram_nginx
+    restart: always
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./static:/static
+      - ./media:/media
+    depends_on:
+      - frontend
+      - backend
+    networks:
+      - foodgram_network
+
+volumes:
+  postgres_data:
+
+networks:
+  foodgram_network:
+    driver: bridge
