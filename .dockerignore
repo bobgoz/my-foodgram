@@ -1,0 +1,30 @@
+# Исключить каталоги зависимостей и артефакты сборки
+node_modules
+bin
+obj
+
+# Исключить системные и IDE-файлы
+*.log
+*.tmp
+*.swp
+*.swo
+*.DS_Store
+.vscode
+.idea
+
+# Исключить git-репозиторий
+.git
+.gitignore
+
+# Исключить docker-compose и другие конфигурационные файлы, если не нужны
+docker-compose*
+compose.y*ml
+
+# Исключить секреты и локальные настройки
+.env
+secrets.dev.yaml
+values.dev.yaml
+
+# Исключить все markdown-файлы, кроме README.md
+*.md
+!README.md

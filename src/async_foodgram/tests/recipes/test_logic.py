@@ -96,3 +96,4 @@ def test_delete_recipe(
         RecipeModel,
         recipe_object.id,
     ), 'Рецепт все же есть в БД.'
+    
