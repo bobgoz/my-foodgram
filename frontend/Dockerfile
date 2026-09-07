@@ -1,8 +1,11 @@
-# build env
-FROM node:21.7.1-alpine
+FROM node:20-alpine
+
 WORKDIR /app
+
 COPY package*.json ./
-RUN npm install
-COPY . ./
+
+RUN npm install --no-audit --prefer-offline
+
+COPY . .
+
 RUN npm run build
-CMD cp -r build result_build

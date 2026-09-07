@@ -10,7 +10,7 @@ ENV UV_PYTHON_DOWNLOADS=0 \
     PYTHONDONTWRITEBYTECODE=1 \
     PYTHONUNBUFFERED=1
 
-WORKDIR /app
+WORKDIR /async_foodgram
 
 # Копируем только файлы с зависимостями (для кеширования слоёв)
 COPY pyproject.toml uv.lock ./
@@ -31,18 +31,18 @@ FROM python:3.12-slim-bookworm
 
 # Создаём пользователя без прав root
 RUN groupadd -g 1001 appgroup && \
-    useradd -u 1001 -g appgroup -m -d /app -s /bin/false appuser
+    useradd -u 1001 -g appgroup -m -d /async_foodgram -s /bin/false appuser
 
-WORKDIR /app
+WORKDIR /async_foodgram
 
 # Копируем виртуальное окружение из builder
-COPY --from=builder --chown=appuser:appgroup /app/.venv /app/.venv
+COPY --from=builder --chown=appuser:appgroup /async_foodgram/.venv /async_foodgram/.venv
 
 # Копируем весь код проекта из builder
-COPY --from=builder --chown=appuser:appgroup /app/ /app/
+COPY --from=builder --chown=appuser:appgroup /async_foodgram/ /async_foodgram/
 
 # Добавляем виртуальное окружение в PATH
-ENV PATH="/app/.venv/bin:$PATH" \
+ENV PATH="/async_foodgram/.venv/bin:$PATH" \
     PYTHONDONTWRITEBYTECODE=1 \
     PYTHONUNBUFFERED=1
 

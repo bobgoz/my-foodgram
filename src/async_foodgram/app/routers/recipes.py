@@ -99,7 +99,6 @@ async def create_recipe(
 )
 async def recipe_list(
     session: Session = Depends(get_session),
-    current_user: UserModel = Depends(get_current_user),
 ) -> list[RecipeResponseSchema]:
     """Возвращает список рецептов."""
     return session.scalars(select(RecipeModel)).all()

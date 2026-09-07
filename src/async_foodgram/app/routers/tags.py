@@ -15,7 +15,6 @@ router = APIRouter(prefix='/tags', tags=['tags'])
 @router.get('/', response_model=list[TagSchema])
 async def get_all_tags(
     session: Session = Depends(get_session),
-    current_user: UserModel = Depends(get_current_user),
 ) -> list[TagModel]:
 
     return list(session.scalars(select(TagModel)).all())

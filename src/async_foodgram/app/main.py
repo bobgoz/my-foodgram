@@ -1,7 +1,6 @@
 from fastapi import FastAPI
 from fastapi_pagination import add_pagination
 
-
 from .routers import (
     auth_router,
     ingredient_router,
@@ -10,7 +9,10 @@ from .routers import (
     user_router,
 )
 
-app = FastAPI(title='Foodgram-bobgoz')
+app = FastAPI(
+    title='Foodgram-bobgoz',
+    root_path='/api',
+)
 
 add_pagination(app)
 
