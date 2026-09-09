@@ -12,14 +12,16 @@ ENV UV_PYTHON_DOWNLOADS=0 \
 
 WORKDIR /async_foodgram
 
-# Копируем только файлы с зависимостями (для кеширования слоёв)
+# Копируем только файлы с зависимостями
+# и переменной окружения (для кеширования слоёв)
 COPY pyproject.toml uv.lock ./
+
 
 # Устанавливаем зависимости (без самого проекта)
 # --frozen — используем только uv.lock, не обновляем
 # --no-install-project — не устанавливаем сам проект (только зависимости)
 RUN --mount=type=cache,target=/root/.cache/uv \
-    uv sync --frozen --no-install-project --no-editable
+    uv sync --frozen --no-install-project
 
 # Копируем весь проект
 COPY src/async_foodgram/ ./

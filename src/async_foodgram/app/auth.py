@@ -7,7 +7,7 @@ from passlib.context import CryptContext
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 
-from .config import ALGORITHM, SECRET_KEY
+from .config import settings
 from .db_depends import get_session
 
 pwd_context = CryptContext(schemes=['bcrypt'], deprecated='auto')
@@ -40,7 +40,11 @@ def create_access_token(data: dict):
         minutes=ACCESS_TOKEN_EXPIRE_MINUTES
     )
     to_encode.update({"exp": expire})
-    return jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
+    return jwt.encode(
+        to_encode,
+        settings.SECRET_KEY,
+        algorithm=settings.ALGORITHM,
+    )
 
 
 async def get_current_user(
@@ -71,9 +75,7 @@ async def get_current_user(
 
     from .models import UserModel
 
-    user = session.scalar(
-        select(UserModel).where(UserModel.email == email)
-    )
+    user = session.scalar(select(UserModel).where(UserModel.email == email))
     if user is None:
         raise credentials_exception
     return user

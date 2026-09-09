@@ -21,7 +21,7 @@ docker-compose*
 compose.y*ml
 
 # Исключить секреты и локальные настройки
-.env
+# .env
 secrets.dev.yaml
 values.dev.yaml
 

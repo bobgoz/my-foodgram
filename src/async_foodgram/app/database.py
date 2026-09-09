@@ -1,12 +1,15 @@
-from sqlalchemy import create_engine
-from sqlalchemy.orm import sessionmaker, DeclarativeBase
 from pathlib import Path
 
-BASE_DIR = Path(__file__).parent.parent.parent.parent
+from sqlalchemy import create_engine
+from sqlalchemy.orm import DeclarativeBase, sessionmaker
 
-DATABASE_URL = f'sqlite:///{BASE_DIR}/foodgram.db'
+from .config import BASE_DIR, settings
 
-engine = create_engine(DATABASE_URL)
+if settings.DEBUG:
+    engine = create_engine(f'sqlite://{BASE_DIR}/foodgram.db')
+else:
+    engine = create_engine(settings.DATABASE_URL)
+
 
 SessionLocal = sessionmaker(engine)
 
