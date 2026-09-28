@@ -1,4 +1,5 @@
 """Модуль, содержащий роутеры для работы с токенами.
+
 Эндпоинты:
     /auth/token/login/ -  Получения токена (авторизация).
     /auth/token/logout/ -  Удаление токена (выход из учетной записи).
@@ -9,7 +10,11 @@ from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 
-from async_foodgram.app.auth import create_access_token, get_current_user
+from async_foodgram.app.auth import (
+    create_access_token,
+    get_current_user,
+)
+from async_foodgram.app.security import verify_password
 from async_foodgram.app.db_depends import get_session
 from async_foodgram.app.models import UserModel
 from async_foodgram.app.schemas.auth import TokenResponseSchema
@@ -22,7 +27,7 @@ router = APIRouter(
 
 
 @router.post(
-    '/login',
+    '/login/',
     response_model=TokenResponseSchema,
     summary='Вход пользователя',
     description='Аутентификация пользователя по email и паролю.'
@@ -41,11 +46,17 @@ async def login(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail='Пользователь не зарегистрирован',
         )
+    verification = verify_password(login_data.password, user.password)
+    if not verification:
+        raise HTTPException(
+            status.HTTP_400_BAD_REQUEST,
+            'Неправильный пароль',
+        )
     access_token = create_access_token(data={'sub': user.email})
     return TokenResponseSchema(auth_token=access_token)
 
 
-@router.post('/logout', status_code=status.HTTP_204_NO_CONTENT)
+@router.post('/logout/', status_code=status.HTTP_204_NO_CONTENT)
 async def logout(current_user: UserModel = Depends(get_current_user)):
     """Эндпоинт для удаления токена (выхода из учетной записи)."""
     return None

@@ -1,6 +1,13 @@
 from typing import TypeVar
 
-from fastapi import APIRouter, Depends, HTTPException, Query, status
+from fastapi import (
+    APIRouter,
+    Depends,
+    HTTPException,
+    Query,
+    Request,
+    status,
+)
 from fastapi_pagination import Page, add_pagination
 from fastapi_pagination.cursor import CursorPage
 from fastapi_pagination.customization import (
@@ -11,10 +18,10 @@ from fastapi_pagination.customization import (
     UseParamsFields,
 )
 from fastapi_pagination.ext.sqlalchemy import paginate
-from sqlalchemy import select
+from sqlalchemy import func, select
 from sqlalchemy.orm import Session
 
-from async_foodgram.app.auth import get_current_user, verify_password
+from async_foodgram.app.auth import get_current_user
 from async_foodgram.app.db_depends import get_session
 from async_foodgram.app.models import UserModel
 from async_foodgram.app.schemas.auth import TokenResponseSchema
@@ -26,6 +33,10 @@ from async_foodgram.app.schemas.users import (
     UserDetailSchema,
 )
 from async_foodgram.app.schemas.users import UserListSchema as UserSchema
+from async_foodgram.app.schemas.users import (
+    UserPaginationResponse,
+)
+from async_foodgram.app.security import verify_password
 
 router = APIRouter(prefix='/users', tags=['users'])
 
@@ -91,7 +102,7 @@ async def user_registration(
 
 
 @router.get(
-    '/me',
+    '/me/',
     response_model=UserDetailSchema,
     summary='Получение профиля текущего пользователя',
 )
@@ -102,7 +113,7 @@ async def get_user_profile(
     return UserDetailSchema.model_validate(current_user)
 
 
-@router.get('/me/avatar', response_model=UserAvatarSchema)
+@router.get('/me/avatar/', response_model=UserAvatarSchema)
 async def get_user_avatar(
     session: Session = Depends(get_session),
     current_user: UserModel = Depends(get_current_user),
@@ -157,11 +168,44 @@ async def get_user_by_id(
     return user
 
 
-@router.get('/', response_model=CustomPage[UserDetailSchema])
+@router.get('/', response_model=UserPaginationResponse)
 async def get_pagination_users(
+    request: Request,
+    page: int = Query(
+        ge=1,
+        default=1,
+        alias='Номер страницы',
+    ),
+    limit: int = Query(
+        ge=1,
+        default=5,
+        alias='Количество объектов на странице',
+    ),
     session: Session = Depends(get_session),
     current_user: UserModel = Depends(get_current_user),
-) -> CustomPage[UserDetailSchema]:
+) -> UserPaginationResponse:
     """Получение пагинированного списка пользователей"""
 
-    return paginate(session, select(UserModel).order_by(UserModel.id))
+    count = session.scalar(select(func.count()).select_from(UserModel)) or 0
+    users = session.scalars(
+        select(UserModel).order_by(UserModel.id)
+        .offset((page - 1) * limit)
+        .limit(limit)
+    ).all()
+    next_url = (
+        str(request.url.include_query_params(page=page + 1))
+        if page * limit < count
+        else None
+    )
+    previous_url = (
+        str(request.url.include_query_params(page=page - 1))
+        if page > 1
+        else None
+    )
+
+    return UserPaginationResponse(
+        count=count,
+        next=next_url,
+        previous=previous_url,
+        results=users,
+    )

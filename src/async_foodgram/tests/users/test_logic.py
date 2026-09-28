@@ -2,7 +2,7 @@
 
 from fastapi import status
 
-from async_foodgram.app.auth import verify_password
+from async_foodgram.app.security import verify_password
 
 
 def test_hash_password(user, user_data):

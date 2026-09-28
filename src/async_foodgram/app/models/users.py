@@ -1,12 +1,15 @@
 from sqlalchemy import String
 from sqlalchemy.orm import Mapped, mapped_column, relationship, validates
 
-from async_foodgram.app.auth import hash_password
+from async_foodgram.app.security import hash_password
 from async_foodgram.app.database import Base
 from async_foodgram.app.models.mixins import PrimaryKeyMixin
 
-MAX_LENGTH_EMAIL_FIELD = 254
-MAX_LENGTH_USERNAME_FIELD = 150
+from .constants import (
+    MAX_LENGTH_EMAIL_FIELD,
+    MAX_LENGTH_PASSWORD,
+    MAX_LENGTH_USERNAME_FIELD,
+)
 
 
 class UserModel(PrimaryKeyMixin, Base):
@@ -33,12 +36,12 @@ class UserModel(PrimaryKeyMixin, Base):
     )
     is_subscribed: Mapped[bool] = mapped_column(default=False)
     avatar: Mapped[str] = mapped_column(default='')
-    password: Mapped[str] = mapped_column(String(50))
+    password: Mapped[str] = mapped_column(String(MAX_LENGTH_PASSWORD))
     recipes: Mapped[list['RecipeModel']] = relationship(
         back_populates='author'
     )
     shopping_cart: Mapped[list['ShoppingCartModel']] = relationship(
-        back_populates='user'
+        back_populates='user',
     )
 
     @validates('password')

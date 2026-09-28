@@ -16,10 +16,8 @@ if config.config_file_name is not None:
 # for 'autogenerate' support
 # from myapp import mymodel
 # target_metadata = mymodel.Base.metadata
-from pathlib import Path
-
-from app.database import Base
-from app.models import *
+from async_foodgram.app.database import Base
+from async_foodgram.app.models import *
 
 target_metadata = Base.metadata
 

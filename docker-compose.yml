@@ -31,13 +31,14 @@ services:
     # env_file:
     #   - .env
     environment:
-      DATABASE_URL: postgresql://test:test@db:5432/test
-      
+      DATABASE_URL: postgresql://user:password@foodgram_db:5432/foodgram
+      PYTHONPATH: /
     volumes:
       - static:/async_foodgram/static
       - media:/async_foodgram/media
     networks:
       - foodgram_network
+    # command: alembic upgrade head
 
   frontend:
     build:

@@ -84,3 +84,12 @@ class SetPasswordSchema(BaseModel):
         if self.new_password == self.current_password:
             raise ValueError('Введённые пароли не должны совпадать.')
         return self
+
+
+class UserPaginationResponse(BaseModel):
+    """Схема - пагинированный список пользователей."""
+
+    count: int
+    next: str | None
+    previous: str | None
+    results: list[UserDetailSchema]

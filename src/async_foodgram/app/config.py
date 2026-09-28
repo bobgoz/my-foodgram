@@ -17,16 +17,15 @@ if not is_env_file:
 class Settings:
     """Конфигурация с переменными окружения."""
 
-    SECRET_KEY: str = os.getenv('SECRET_KEY')
+    SECRET_KEY = os.getenv('SECRET_KEY')
     if not SECRET_KEY:
         raise RuntimeError(
             'Переменная SECRET_KEY не задана в переменных окружения!',
         )
     ACCESS_TOKEN_EXPIRE_MINUTES: int = 10000
-    ALGORITHM: str = 'HS256'
-    DATABASE_URL: str = os.getenv(
+    ALGORITHM = 'HS256'
+    DATABASE_URL = os.getenv(
         "DATABASE_URL",
-        "postgresql://user:password@localhost:5432/foodgram",
     )
     if not DATABASE_URL:
         raise RuntimeError(
