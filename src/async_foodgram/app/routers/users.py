@@ -24,6 +24,7 @@ from sqlalchemy.orm import Session
 from async_foodgram.app.auth import get_current_user
 from async_foodgram.app.db_depends import get_session
 from async_foodgram.app.models import UserModel
+from async_foodgram.app.pagination import paginate_query
 from async_foodgram.app.schemas.auth import TokenResponseSchema
 from async_foodgram.app.schemas.users import (
     LoginSchema,
@@ -174,38 +175,22 @@ async def get_pagination_users(
     page: int = Query(
         ge=1,
         default=1,
-        alias='Номер страницы',
     ),
     limit: int = Query(
         ge=1,
         default=5,
-        alias='Количество объектов на странице',
     ),
     session: Session = Depends(get_session),
     current_user: UserModel = Depends(get_current_user),
 ) -> UserPaginationResponse:
     """Получение пагинированного списка пользователей"""
 
-    count = session.scalar(select(func.count()).select_from(UserModel)) or 0
-    users = session.scalars(
-        select(UserModel).order_by(UserModel.id)
-        .offset((page - 1) * limit)
-        .limit(limit)
-    ).all()
-    next_url = (
-        str(request.url.include_query_params(page=page + 1))
-        if page * limit < count
-        else None
-    )
-    previous_url = (
-        str(request.url.include_query_params(page=page - 1))
-        if page > 1
-        else None
-    )
+    stmt = select(UserModel).order_by(UserModel.id)
 
-    return UserPaginationResponse(
-        count=count,
-        next=next_url,
-        previous=previous_url,
-        results=users,
+    return paginate_query(
+        session,
+        request,
+        stmt,
+        page,
+        limit,
     )

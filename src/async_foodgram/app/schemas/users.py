@@ -7,11 +7,13 @@ from pydantic import (
     model_validator,
 )
 
+from .mixins import BasePaginationResponse
+
 
 class UserEmail(BaseModel):
     """Схема, содержащая поле email."""
 
-    email: EmailStr
+    email: str
 
 
 class UserBase(UserEmail):
@@ -31,7 +33,7 @@ class UserCreate(UserBase):
 class LoginSchema(BaseModel):
     """Схема для входа пользователя."""
 
-    email: EmailStr
+    email: str
     password: str
 
 
@@ -86,10 +88,5 @@ class SetPasswordSchema(BaseModel):
         return self
 
 
-class UserPaginationResponse(BaseModel):
+class UserPaginationResponse(BasePaginationResponse[UserDetailSchema]):
     """Схема - пагинированный список пользователей."""
-
-    count: int
-    next: str | None
-    previous: str | None
-    results: list[UserDetailSchema]

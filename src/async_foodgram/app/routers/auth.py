@@ -14,11 +14,11 @@ from async_foodgram.app.auth import (
     create_access_token,
     get_current_user,
 )
-from async_foodgram.app.security import verify_password
 from async_foodgram.app.db_depends import get_session
 from async_foodgram.app.models import UserModel
 from async_foodgram.app.schemas.auth import TokenResponseSchema
 from async_foodgram.app.schemas.users import LoginSchema
+from async_foodgram.app.security import verify_password
 
 router = APIRouter(
     prefix='/auth/token',
@@ -37,6 +37,13 @@ async def login(
     login_data: LoginSchema, session: Session = Depends(get_session)
 ) -> TokenResponseSchema:
     """Эндпоинт для входа пользователя."""
+
+    if '@' not in login_data.email:
+        raise HTTPException(
+            status.HTTP_422_UNPROCESSABLE_CONTENT,
+            'Поле email должно содержать корректный адрес электронной почты.',
+        )
+
     user = session.scalar(
         select(UserModel).where(UserModel.email == login_data.email)
     )

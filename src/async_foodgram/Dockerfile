@@ -49,7 +49,7 @@ ENV PATH="/async_foodgram/.venv/bin:$PATH" \
     PYTHONUNBUFFERED=1
 
 # Переключаемся на непривилегированного пользователя
-USER appuser
+# USER appuser
 
 # Открываем порт
 EXPOSE 8000

@@ -1,5 +1,6 @@
 from pydantic import BaseModel, Field, HttpUrl, model_validator
 
+from .mixins import BasePaginationResponse
 from .tags import TagSchema
 from .users import UserDetailSchema
 
@@ -66,7 +67,7 @@ class RecipeResponseSchema(BaseModel):
                         'id': recipe_ing.ingredient.id,
                         'name': recipe_ing.ingredient.name,
                         'measurement_unit': recipe_ing.ingredient.measurement_unit,
-                        'amount': recipe_ing.amount,  # ← Вот он, amount!
+                        'amount': recipe_ing.amount,
                     }
                 )
             # Устанавливаем ingredients как атрибут объекта
@@ -81,10 +82,14 @@ class ShoppingCartResponseSchema(BaseModel):
     """Схема для ответа при добавлении рецепта в список покупок."""
 
     id: int
-    name: str = Field(default='Это временное решение')
+    name: str
     # image: HttpUrl
-    image: str = Field(default='Это временное решение')
-    cooking_time: int = Field(default=100000)
+    image: str = Field(default='Картинка')
+    cooking_time: int
 
     class Config:
         from_attributes = True
+
+
+class RecipePaginationResponse(BasePaginationResponse[RecipeResponseSchema]):
+    """Схема - пагинированный список рецептов."""

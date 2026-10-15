@@ -4,6 +4,8 @@ from fastapi import (
     APIRouter,
     Depends,
     HTTPException,
+    Query,
+    Request,
     status,
 )
 from sqlalchemy import (
@@ -28,9 +30,11 @@ from async_foodgram.app.models.associations import (
     recipe_ingredient,
     recipe_tag,
 )
+from async_foodgram.app.pagination import paginate_query
 from async_foodgram.app.schemas.recipes import (
     IngredientInRecipeCreateSchema,
     RecipeCreateSchema,
+    RecipePaginationResponse,
     RecipeResponseSchema,
     ShoppingCartResponseSchema,
 )
@@ -60,11 +64,23 @@ async def create_recipe(
     current_user: UserModel = Depends(get_current_user),
 ) -> RecipeResponseSchema:
     """Эндпоинт для создания рецепта."""
+    from async_foodgram.app.utils import ImageHandler
 
+    # Обработка излбражения.
+    try:
+        image_path = ImageHandler.save_base64_image(recipe_create.image)
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(
+            status.HTTP_400_BAD_REQUEST,
+            f'Ошибка при обработке изображения: {str(e)}',
+        )
     recipe = RecipeModel(
         **recipe_create.model_dump(
-            exclude={'ingredients', 'tags'},
+            exclude={'ingredients', 'tags', 'image'},
         ),
+        image=image_path,
         author_id=current_user.id,
     )
 
@@ -94,18 +110,48 @@ async def create_recipe(
 
 @router.get(
     '/',
-    response_model=list[RecipeResponseSchema],
+    response_model=RecipePaginationResponse,
     summary='Получение списка рецептов',
 )
-async def recipe_list(
+async def get_pagination_recipes(
+    request: Request,
+    page: int = Query(default=1, ge=1),
+    limit: int = Query(default=5, ge=1),
+    # is_favorited: int = Query(default=0, ge=1, le=0),
+    # is_in_shopping_cart: int = Query(default=0, ge=1, le=0),
+    author: int | None = Query(default=None, ge=1),
+    tags: list[str] | None = Query(default=None),
     session: Session = Depends(get_session),
-) -> list[RecipeResponseSchema]:
-    """Возвращает список рецептов."""
-    return session.scalars(select(RecipeModel)).all()
+    # current_user: UserModel = Depends(get_current_user),
+) -> RecipePaginationResponse:
+    """Возвращает пагинированный список рецептов."""
+
+    stmt = select(RecipeModel)
+
+    if author:
+        stmt = stmt.where(RecipeModel.author_id == author)
+    if tags:
+        stmt = (
+            stmt.join(recipe_tag).join(TagModel).where(TagModel.slug.in_(tags))
+        ).distinct()
+    # if is_in_shopping_cart:
+    #     stmt = stmt.where(
+    #         RecipeModel.id.in_(
+    #             select(ShoppingCartModel.user_id == current_user.id),
+    #         )
+    #     )
+    # Фильтр избранного будет тут.
+    return paginate_query(
+        session,
+        stmt,
+        request,
+        page,
+        limit,
+    )
 
 
 @router.get(
-    '/{recipe_id}',
+    '/{recipe_id}/',
     response_model=RecipeResponseSchema,
     summary='Получение рецепта по id',
 )
@@ -127,8 +173,8 @@ async def recipe_detail(
     )
 
 
-@router.put(
-    '/{recipe_id}',
+@router.patch(
+    '/{recipe_id}/',
     response_model=RecipeResponseSchema,
     summary='Обновление рецепта.',
 )
@@ -139,6 +185,7 @@ async def recipe_update(
     current_user: UserModel = Depends(get_current_user),
 ):
     """Обновление рецепта."""
+    from async_foodgram.app.utils import ImageHandler
 
     recipe = session.get(RecipeModel, recipe_id)
     if not recipe:
@@ -152,7 +199,35 @@ async def recipe_update(
             status.HTTP_406_NOT_ACCEPTABLE,
             message_forbidden(),
         )
-    update_data = recipe_update.model_dump(exclude=('ingredients', 'tags'))
+
+    # Обработка нового изображения
+    old_image = recipe.image
+    if recipe_update.image != old_image:
+        try:
+            new_image_path = ImageHandler.save_base64_image(
+                recipe_update.image
+            )
+            # Удаляем старое изображение
+            ImageHandler.delete_image(old_image)
+        except HTTPException:
+            raise
+        except Exception as e:
+            raise HTTPException(
+                status.HTTP_400_BAD_REQUEST,
+                f'Ошибка при обработке изображения: {str(e)}',
+            )
+    else:
+        new_image_path = old_image
+
+    update_data = recipe_update.model_dump(
+        exclude=(
+            'ingredients',
+            'tags',
+            'image',
+        )
+    )
+    update_data['image'] = new_image_path
+
     session.execute(
         update(RecipeModel)
         .where(RecipeModel.id == recipe_id)
@@ -223,13 +298,15 @@ async def recipe_update(
     return recipe
 
 
-@router.delete('/{recipe_id}', status_code=status.HTTP_204_NO_CONTENT)
+@router.delete('/{recipe_id}/', status_code=status.HTTP_204_NO_CONTENT)
 async def recipe_delete(
     recipe_id: int,
     session: Session = Depends(get_session),
     current_user: UserModel = Depends(get_current_user),
 ):
     """Удаление рецепта."""
+    from async_foodgram.app.utils import ImageHandler
+
     recipe = session.get(RecipeModel, recipe_id)
     if not recipe:
         raise HTTPException(
@@ -241,12 +318,16 @@ async def recipe_delete(
             status.HTTP_403_FORBIDDEN,
             message_forbidden(),
         )
+
+    # Удаляем изображение
+    ImageHandler.delete_image(recipe.image)
+
     session.delete(recipe)
     session.commit()
     return None
 
 
-@router.get('/{recipe_id}/get-link')
+@router.get('/{recipe_id}/get-link/')
 async def get_short_link(
     session: Session = Depends(get_session),
     current_user: UserModel = Depends(get_current_user),
@@ -255,7 +336,7 @@ async def get_short_link(
     return None
 
 
-@router.get('/download_shopping_cart')
+@router.get('/download_shopping_cart/')
 async def download_shopping_cart(
     session: Session = Depends(get_session),
     current_user: UserModel = Depends(get_current_user),
@@ -265,7 +346,7 @@ async def download_shopping_cart(
 
 
 @router.post(
-    '/{recipe_id}/shopping_cart',
+    '/{recipe_id}/shopping_cart/',
     status_code=status.HTTP_201_CREATED,
     response_model=ShoppingCartResponseSchema,
 )
@@ -305,7 +386,7 @@ async def add_recipe_in_shopping_cart(
 
 
 @router.delete(
-    '/{recipe_id}/shopping_cart',
+    '/{recipe_id}/shopping_cart/',
     status_code=status.HTTP_204_NO_CONTENT,
 )
 async def delete_recipe_from_shopping_cart(

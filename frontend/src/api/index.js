@@ -48,7 +48,7 @@ class Api {
             method: "POST",
             headers: {
                 ...this._headers,
-                authorization: `Bearer ${token}`,
+                Authorization: `Bearer ${token}`,
             },
         }).then(this.checkResponse);
     }
@@ -73,7 +73,7 @@ class Api {
             method: "GET",
             headers: {
                 ...this._headers,
-                authorization: `Bearer ${token}`,
+                Authorization: `Bearer ${token}`,
             },
         }).then(this.checkResponse);
     }
@@ -84,7 +84,7 @@ class Api {
             method: "POST",
             headers: {
                 ...this._headers,
-                authorization: `Bearer ${token}`,
+                Authorization: `Bearer ${token}`,
             },
             body: JSON.stringify({ current_password, new_password }),
         }).then(this.checkResponse);
@@ -96,7 +96,7 @@ class Api {
             method: "PUT",
             headers: {
                 ...this._headers,
-                authorization: `Bearer ${token}`,
+                Authorization: `Bearer ${token}`,
             },
             body: JSON.stringify({ avatar: file }),
         }).then(this.checkResponse);
@@ -108,7 +108,7 @@ class Api {
             method: "DELETE",
             headers: {
                 ...this._headers,
-                authorization: `Bearer ${token}`,
+                Authorization: `Bearer ${token}`,
             },
         }).then(this.checkResponse);
     }
@@ -134,7 +134,7 @@ class Api {
         tags,
     } = {}) {
         const token = localStorage.getItem("token");
-        const authorization = token ? { authorization: `Bearer ${token}` } : {};
+        const authorization = token ? { Authorization: `Bearer ${token}` } : {};
         const tagsString = tags
             ? tags
                 .filter((tag) => tag.value)
@@ -157,7 +157,7 @@ class Api {
 
     getRecipe({ recipe_id }) {
         const token = localStorage.getItem("token");
-        const authorization = token ? { authorization: `Bearer ${token}` } : {};
+        const authorization = token ? { Authorization: `Bearer ${token}` } : {};
         return fetch(`/api/recipes/${recipe_id}/`, {
             method: "GET",
             headers: {
@@ -180,7 +180,7 @@ class Api {
             method: "POST",
             headers: {
                 ...this._headers,
-                authorization: `Bearer ${token}`,
+                Authorization: `Bearer ${token}`,
             },
             body: JSON.stringify({
                 name,
@@ -203,7 +203,7 @@ class Api {
             method: "PATCH",
             headers: {
                 ...this._headers,
-                authorization: `Bearer ${token}`,
+                Authorization: `Bearer ${token}`,
             },
             body: JSON.stringify({
                 name,
@@ -223,7 +223,7 @@ class Api {
             method: "POST",
             headers: {
                 ...this._headers,
-                authorization: `Bearer ${token}`,
+                Authorization: `Bearer ${token}`,
             },
         }).then(this.checkResponse);
     }
@@ -234,7 +234,7 @@ class Api {
             method: "DELETE",
             headers: {
                 ...this._headers,
-                authorization: `Bearer ${token}`,
+                Authorization: `Bearer ${token}`,
             },
         }).then(this.checkResponse);
     }
@@ -250,7 +250,7 @@ class Api {
 
     getUser({ id }) {
         const token = localStorage.getItem("token");
-        const authorization = token ? { authorization: `Bearer ${token}` } : {};
+        const authorization = token ? { Authorization: `Bearer ${token}` } : {};
         return fetch(`/api/users/${id}/`, {
             method: "GET",
             headers: {
@@ -266,7 +266,7 @@ class Api {
             method: "GET",
             headers: {
                 ...this._headers,
-                authorization: `Bearer ${token}`,
+                Authorization: `Bearer ${token}`,
             },
         }).then(this.checkResponse);
     }
@@ -281,7 +281,7 @@ class Api {
                 method: "GET",
                 headers: {
                     ...this._headers,
-                    authorization: `Bearer ${token}`,
+                    Authorization: `Bearer ${token}`,
                 },
             }
         ).then(this.checkResponse);
@@ -293,7 +293,7 @@ class Api {
             method: "DELETE",
             headers: {
                 ...this._headers,
-                authorization: `Bearer ${token}`,
+                Authorization: `Bearer ${token}`,
             },
         }).then(this.checkResponse);
     }
@@ -304,7 +304,7 @@ class Api {
             method: "POST",
             headers: {
                 ...this._headers,
-                authorization: `Bearer ${token}`,
+                Authorization: `Bearer ${token}`,
             },
         }).then(this.checkResponse);
     }
@@ -336,7 +336,7 @@ class Api {
             method: "POST",
             headers: {
                 ...this._headers,
-                authorization: `Bearer ${token}`,
+                Authorization: `Bearer ${token}`,
             },
         }).then(this.checkResponse);
     }
@@ -347,7 +347,7 @@ class Api {
             method: "DELETE",
             headers: {
                 ...this._headers,
-                authorization: `Bearer ${token}`,
+                Authorization: `Bearer ${token}`,
             },
         }).then(this.checkResponse);
     }
@@ -358,7 +358,7 @@ class Api {
             method: "DELETE",
             headers: {
                 ...this._headers,
-                authorization: `Bearer ${token}`,
+                Authorization: `Bearer ${token}`,
             },
         }).then(this.checkResponse);
     }
@@ -369,7 +369,7 @@ class Api {
             method: "GET",
             headers: {
                 ...this._headers,
-                authorization: `Bearer ${token}`,
+                Authorization: `Bearer ${token}`,
             },
         }).then(this.checkFileDownloadResponse);
     }
